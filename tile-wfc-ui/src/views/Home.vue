@@ -1,7 +1,7 @@
 <template>
-  <HelloWorld />
+  <ListProcess />
 </template>
 
 <script setup>
-  import HelloWorld from '@/components/HelloWorld.vue'
+  import ListProcess from '@/components/ListProcess.vue'
 </script>
