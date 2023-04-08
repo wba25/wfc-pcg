@@ -63,15 +63,15 @@
           </template>
         </v-slider>
         <h4 class="headline my-2">Assets</h4>
-        <v-row class="mb-2" align="center" justify="space-between" no-gutters v-for="(file, index) in files">
+        <v-row class="mb-2" align="center" justify="space-between" no-gutters v-for="(asset, index) in assets">
           <v-col cols="10">
             <v-file-input
-              v-model="files[index]"
+              v-model="assets[index]"
               placeholder="Selecione uma imagem"
               prepend-icon=""
               density="compact"
               accept="image/*"
-              @change="previewFile(files[index])"
+              @change="previewFile(assets[index])"
               class="tile-form-input"
               bg-color="rgba(255, 255, 255, 0.8)"
               variant="plain"
@@ -80,10 +80,10 @@
             ></v-file-input>
           </v-col>
           <v-col class="text-right" cols="2">
-            <v-btn density="compact" icon="mdi-minus" @click="files.splice(file, 1)"></v-btn>
+            <v-btn density="compact" icon="mdi-minus" @click="assets.splice(asset, 1)"></v-btn>
           </v-col>
         </v-row>
-        <v-btn icon="mdi-plus" class="ml-1" density="compact" @click="files.push(1)"></v-btn>
+        <v-btn icon="mdi-plus" class="ml-1" density="compact" @click="assets.push(1)"></v-btn>
       </v-form>
     </v-card-text>
   </v-card>
@@ -103,7 +103,7 @@
         name: "tile",
         symmetry: "X",
         weight: 1,
-        files: [],
+        assets: [],
         bgImage: '',
         symmetryItems: [
           { text: 'L', value: 'L' },
@@ -119,26 +119,40 @@
     watch: {
       name(newName, oldName) {
         if (newName !== oldName) {
-          this.syncTileData();
+          this.commitTileData();
         }
       },
       symmetry(newSymmetry, oldSymmetry) {
         if (newSymmetry !== oldSymmetry) {
-          this.syncTileData();
+          this.commitTileData();
         }
       },
       weight(newWeight, oldWeight) {
         if (newWeight !== oldWeight) {
-          this.syncTileData();
+          this.commitTileData();
         }
       },
     },
     mounted: function () {
-      this.syncTileData();
+      const storedTile = this.getTile(this.tileId);
+      if (storedTile) {
+        this.name = storedTile.name;
+        this.symmetry = storedTile.symmetry;
+        this.weight = storedTile.weight;
+        this.assets = storedTile.assets;
+        if (this.assets.length > 0) {
+          this.previewFile(this.assets[0])
+        }
+      } else {
+        this.commitTileData();
+      }
+    },
+    computed: {
+      ...mapGetters(["getTile"]),
     },
     methods: {
       ...mapMutations(["addTile"]),
-      syncTileData() {
+      commitTileData() {
         this.addTile(
           {
             id: this.tileId,
@@ -146,7 +160,7 @@
               name: this.name,
               symmetry: this.symmetry,
               weight: this.weight,
-              assets: this.files,
+              assets: this.assets,
             }
           }
         );

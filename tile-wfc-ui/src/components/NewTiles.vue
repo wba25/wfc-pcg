@@ -2,14 +2,25 @@
   <v-container class="fill-height">
     <v-responsive class="d-flex align-center fill-height">
       <v-row class="d-flex align-center justify-center">
-        <v-col cols="12">
+        <v-col>
           <v-text-field
             v-model="tilemapName"
             variant="outlined"
             density="comfortable"
+            label="Nome do tilemap"
           ></v-text-field>
         </v-col>
-        <v-spacer />
+        <v-col cols="2">
+          <v-text-field
+            v-model="tileSize"
+            :prefix="tileSize + ' X '"
+            suffix="px"
+            type="number"
+            variant="outlined"
+            density="comfortable"
+            label="Tamanho dos tiles"
+          ></v-text-field>
+        </v-col>
       </v-row>
       <v-row>
         <v-col cols="auto" v-for="tile in tiles">
@@ -51,13 +62,15 @@
   import TileForm from '@/components/TileForm.vue';
   import { mapGetters, mapMutations } from "vuex";
   import { v4 as uuidv4 } from 'uuid';
+  import { validateTilesNames, validateTilesWeights, validateTilesSymmetries } from '../common/validation';
   export default {
     components: {
       TileForm
     },
     data () {
       return {
-        tilemapName: 'Novo Tilemap',
+        tilemapName: '',
+        tileSize: 0,
         tiles: [],
         errors: []
       }
@@ -68,49 +81,52 @@
           this.setPath(newName);
         }
       },
+      tileSize(newSize, oldSize) {
+        if (newSize !== oldSize) {
+          this.setTilesize(this.tileSize);
+        }
+      }
     },
     mounted () {
-      this.setPath(this.tilemapName);
+      this.tilemapName = this.getPathName;
+      this.tileSize = this.getTilesize;
+      this.initTiles(this.getTiles);
+    },
+    computed: {
+      ...mapGetters(["tilemap", "getPathName", "getTilesize", "getTiles"])
     },
     methods: {
-      ...mapMutations(["setPath"]),
+      ...mapMutations(["setPath", "setTilesize", "setRegisterStage"]),
+      initTiles(rawTiles) {
+        Object.keys(rawTiles).forEach((tileId) => {
+          this.tiles.push({
+            id: tileId
+          })
+        })
+      },
       generateNewTileId () {
         return uuidv4();
       },
       validateTiles () {
-        // TODO: validar do store diretamente
         this.errors = [];
-        if (this.tiles.length < 1) {
+        if (this.tilemap.tiles.length < 1) {
           this.errors.push({
             title: 'Número de tiles insuficiente',
             text: 'É necessário pelo menos um tile para gerar um tilemap'
           })
         }
-        else {
-          for (let i = 0; i < this.tiles.length; i++) {
-            if (this.tiles[i].name === '') {
-              this.errors.push({
-                title: 'Nome de tile inválido',
-                text: `O nome do tile ${i+1} não pode ser vazio`
-              })
-            }
-            if (this.tiles[i].symmetry === '') {
-              this.errors.push({
-                title: 'Simetria de tile inválida',
-                text: `A simetria do tile ${i+1} não pode ser vazia`
-              })
-            }
-            
-          }
+        let error = validateTilesNames(this.tilemap.tiles) || validateTilesWeights(this.tilemap.tiles) || validateTilesSymmetries(this.tilemap.tiles);
+        if (error) {
+          this.errors.push({
+            title: 'Tile inválido',
+            text: error
+          })
         }
         return this.errors.length === 0
       },
       next () {
         if (this.validateTiles()) {
-          // commit mutations
-          this.$router.push({ name: 'NewAdjacency', params: { tilemapName: this.tilemapName, tiles: this.tiles } })
-        } else {
-          // show erros
+          this.setRegisterStage(1);
         }
       }
     }
