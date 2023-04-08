@@ -26,3 +26,12 @@ export function validateTilesSymmetries(tiles) {
     }
     return null;
 }
+
+export function validateTilesAssets(tiles) {
+    for (let i = 0; i < tiles.length; i++) {
+        if (tiles[i].assets.length === 0) {
+            return `${i+1}º tile sem assets`;
+        }
+    }
+    return null;
+}

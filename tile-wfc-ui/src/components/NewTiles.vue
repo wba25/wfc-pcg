@@ -24,12 +24,15 @@
       </v-row>
       <v-row>
         <v-col cols="auto" v-for="tile in tiles">
-          <TileForm
-            :tile-id="tile.id"
-          />
+          <TileForm :tile-id="tile.id" :onDelete="() => removeTileWithId(tile.id)"/>
         </v-col>
         <v-col>
-          <v-btn density="compact" icon="mdi-plus" @click="tiles.push({ id: generateNewTileId() })"></v-btn>
+
+          <v-btn
+            density="compact"
+            icon="mdi-plus"
+            @click="tiles.push({ id: generateNewTileId() })"
+          ></v-btn>
         </v-col>
       </v-row>
       <v-row>
@@ -48,10 +51,14 @@
       </v-row>
       <v-row justify="end">
         <v-col cols="auto">
-          <v-btn size="large" color="secondary" @click="$router.go(-1)">Cancelar</v-btn>
+          <v-btn size="large" color="secondary" @click="$router.go(-1)"
+            >Cancelar</v-btn
+          >
         </v-col>
         <v-col cols="auto">
-          <v-btn size="large" color="primary" @click="next">Definir adjacência</v-btn>
+          <v-btn size="large" color="primary" @click="next"
+            >Definir adjacência</v-btn
+          >
         </v-col>
       </v-row>
     </v-responsive>
@@ -59,76 +66,89 @@
 </template>
 
 <script>
-  import TileForm from '@/components/TileForm.vue';
-  import { mapGetters, mapMutations } from "vuex";
-  import { v4 as uuidv4 } from 'uuid';
-  import { validateTilesNames, validateTilesWeights, validateTilesSymmetries } from '../common/validation';
-  export default {
-    components: {
-      TileForm
-    },
-    data () {
-      return {
-        tilemapName: '',
-        tileSize: 0,
-        tiles: [],
-        errors: []
+import TileForm from "@/components/TileForm.vue";
+import { mapGetters, mapMutations } from "vuex";
+import { v4 as uuidv4 } from "uuid";
+import {
+  validateTilesNames,
+  validateTilesWeights,
+  validateTilesSymmetries,
+  validateTilesAssets,
+} from "../common/validation";
+export default {
+  components: {
+    TileForm,
+  },
+  data() {
+    return {
+      tilemapName: "",
+      tileSize: 0,
+      tiles: [],
+      errors: [],
+    };
+  },
+  watch: {
+    tilemapName(newName, oldName) {
+      if (newName !== oldName) {
+        this.setPath(newName);
       }
     },
-    watch: {
-      tilemapName(newName, oldName) {
-        if (newName !== oldName) {
-          this.setPath(newName);
-        }
-      },
-      tileSize(newSize, oldSize) {
-        if (newSize !== oldSize) {
-          this.setTilesize(this.tileSize);
-        }
+    tileSize(newSize, oldSize) {
+      if (newSize !== oldSize) {
+        this.setTilesize(this.tileSize);
       }
     },
-    mounted () {
-      this.tilemapName = this.getPathName;
-      this.tileSize = this.getTilesize;
-      this.initTiles(this.getTiles);
+  },
+  mounted() {
+    this.tilemapName = this.getPathName;
+    this.tileSize = this.getTilesize;
+    this.initTiles(this.getTiles);
+  },
+  computed: {
+    ...mapGetters(["tilemap", "getPathName", "getTilesize", "getTiles"]),
+  },
+  methods: {
+    ...mapMutations(["setPath", "setTilesize", "setRegisterStage", "removeTile"]),
+    removeTileWithId(tileId) {
+      this.tiles = this.tiles.filter((tile) => tile.id !== tileId);
+      this.removeTile(tileId);
     },
-    computed: {
-      ...mapGetters(["tilemap", "getPathName", "getTilesize", "getTiles"])
+    initTiles(rawTiles) {
+      Object.keys(rawTiles).forEach((tileId) => {
+        this.tiles.push({
+          id: tileId,
+        });
+      });
     },
-    methods: {
-      ...mapMutations(["setPath", "setTilesize", "setRegisterStage"]),
-      initTiles(rawTiles) {
-        Object.keys(rawTiles).forEach((tileId) => {
-          this.tiles.push({
-            id: tileId
-          })
-        })
-      },
-      generateNewTileId () {
-        return uuidv4();
-      },
-      validateTiles () {
-        this.errors = [];
-        if (this.tilemap.tiles.length < 1) {
-          this.errors.push({
-            title: 'Número de tiles insuficiente',
-            text: 'É necessário pelo menos um tile para gerar um tilemap'
-          })
-        }
-        let error = validateTilesNames(this.tilemap.tiles) || validateTilesWeights(this.tilemap.tiles) || validateTilesSymmetries(this.tilemap.tiles);
-        if (error) {
-          this.errors.push({
-            title: 'Tile inválido',
-            text: error
-          })
-        }
-        return this.errors.length === 0
-      },
-      next () {
-        if (this.validateTiles()) {
-          this.setRegisterStage(1);
-        }
+    generateNewTileId() {
+      return uuidv4();
+    },
+    validateTiles() {
+      this.errors = [];
+      if (this.tilemap.tiles.length < 1) {
+        this.errors.push({
+          title: "Número de tiles insuficiente",
+          text: "É necessário pelo menos um tile para gerar um tilemap",
+        });
       }
-    }
-  }
+      let error =
+        validateTilesNames(this.tilemap.tiles) ||
+        validateTilesWeights(this.tilemap.tiles) ||
+        validateTilesSymmetries(this.tilemap.tiles) ||
+        validateTilesAssets(this.tilemap.tiles);
+      if (error) {
+        this.errors.push({
+          title: "Tile inválido",
+          text: error,
+        });
+      }
+      return this.errors.length === 0;
+    },
+    next() {
+      if (this.validateTiles()) {
+        this.setRegisterStage(1);
+      }
+    },
+  },
+};
 </script>

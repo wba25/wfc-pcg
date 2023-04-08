@@ -7,6 +7,9 @@
     :image="bgImage"
     color="#bdbdbd"
   >
+    <div class="float-btn">
+      <v-btn color="error" density="compact" icon="mdi-close-circle" variant="plain" @click="onDelete"></v-btn>
+    </div>
     <v-card-text>
       <v-form>
         <v-row>
@@ -96,7 +99,11 @@
       tileId: {
         type: String,
         required: true,
-      }
+      },
+      onDelete: {
+        type: Function,
+        required: true,
+      },
     },
     data () { 
       return {
@@ -180,3 +187,11 @@
     },
   }
 </script>
+<style scoped>
+.float-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+}
+</style>
