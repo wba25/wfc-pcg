@@ -8,7 +8,7 @@ const store = createStore({
       path: "data/novo_tilemap/",
       tilesize: 8,
       tiles: {}, // {id: "", name: "", symmetry: "", weight: 0, assets: []} // base64 image
-      neighbors: [] // { left: "", right: ""}
+      neighbors: {} // { left: "", right: ""}
     };
   },
   mutations: {
@@ -21,11 +21,9 @@ const store = createStore({
     setTilesize(state, tilesize) {
         state.tilesize = tilesize;
     },
+    // Tiles
     resetTiles(state, tiles = []) {
-        state.tiles = tiles;
-    },
-    resetNeighbors(state, neighbors = []) {
-        state.neighbors = neighbors;
+      state.tiles = tiles;
     },
     addTile(state, payload) {
       state.tiles[payload["id"]] = payload["tile"];
@@ -33,29 +31,27 @@ const store = createStore({
     removeTile(state, id) {
       delete state.tiles[id];
     },
-    addNeighbor(state, neighbor) {
-      state.neighbors.push(neighbor);
+    // Neighbors
+    resetNeighbors(state, neighbors = []) {
+      state.neighbors = neighbors;
     },
-    removeNeighborByIndex(state, neighborIndex) {
-      state.neighbors.splice(neighborIndex, 1);
+    addNeighbor(state, payload) {
+      state.neighbors[payload["id"]] = payload["neighbor"];
+    },
+    removeNeighbor(state, id) {
+      delete state.neighbors[id];
     }
   },
   getters: {
     getRegisterStage(state) {
       return state.registerStage;
     },
-    getTiles(state) {
-      return state.tiles;
-    },
-    getTile: (state) => (id) => {
-      return state.tiles[id] || null;
-    },
     tilemap (state) {
       return {
         path: state.path,
         tilesize: state.tilesize,
         tiles: Object.getOwnPropertyNames(state.tiles).length !== 0 ? getObjValues(state.tiles) : [],
-        neighbors: state.neighbors
+        neighbors: Object.getOwnPropertyNames(state.neighbors).length !== 0 ? getObjValues(state.neighbors) : []
       }
     },
     getPathName(state) {
@@ -63,7 +59,29 @@ const store = createStore({
     },
     getTilesize(state) {
       return state.tilesize;
-    }
+    },
+    // Tiles
+    getTiles(state) {
+      return state.tiles;
+    },
+    getTile: (state) => (id) => {
+      return state.tiles[id] || null;
+    },
+    getTileAsset: (state, getters) => (rawName) => {
+      let [name, index] = rawName.split(" ");
+      let tile = getters.tilemap.tiles.filter(t => t.name === name)[0] || null;
+      if (tile) {
+        return tile.assets[parseInt(index)] || null;
+      }
+      return null;
+    },
+    // Neighbors
+    getNeighbors(state) {
+      return state.neighbors;
+    },
+    getNeighbor: (state) => (id) => {
+      return state.neighbors[id] || null;
+    },
   }
 });
 

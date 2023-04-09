@@ -2,6 +2,22 @@
   <v-container class="fill-height">
     <v-responsive class="d-flex align-center fill-height">
       <v-row>
+        <v-col cols="auto" v-for="neighbor in neighbors">
+          <NeighborForm 
+            :neighbor-id="neighbor.id"
+            :neighbor-options="neighborsOpts"
+            :onDelete="() => removeNeighborWithId(neighbor.id)"
+          />
+        </v-col>
+        <v-col>
+          <v-btn
+            density="compact"
+            icon="mdi-plus"
+            @click="neighbors.push({ id: generateNewNeighborId() })"
+          ></v-btn>
+        </v-col>
+      </v-row>
+      <v-row>
         <v-col cols="12" v-for="erro in errors">
           <v-alert
             type="error"
@@ -28,22 +44,44 @@
 </template>
 
 <script>
-  import TileForm from '@/components/TileForm.vue';
+  import NeighborForm from '@/components/NeighborForm.vue';
   import { mapGetters, mapMutations } from "vuex";
-  import { v4 as uuidv4 } from 'uuid';
+  import { v4 as uuidv4 } from "uuid";
   export default {
     components: {
-      TileForm
+      NeighborForm
     },
     data () {
       return {
+        neighbors: [],
+        neighborsOpts: [],
         errors: []
       }
     },
     watch: {},
-    mounted () {},
+    mounted () {
+      this.initNeighborsOpts();
+    },
+    computed: {
+      ...mapGetters(["tilemap"])
+    },
     methods: {
-      ...mapMutations(["setRegisterStage"])
+      ...mapMutations(["setRegisterStage", "removeNeighbor"]),
+      removeNeighborWithId(neighborId) {
+        this.neighbors = this.neighbors.filter((n) => n.id !== neighborId);
+        this.removeNeighbor(neighborId);
+      },
+      generateNewNeighborId() {
+        return uuidv4();
+      },
+      initNeighborsOpts(){
+        this.neighborsOpts = [];
+        for (let i = 0; i < this.tilemap.tiles.length; i++) {
+          for (let j = 0; j < this.tilemap.tiles[i].assets.length; j++) {
+            this.neighborsOpts.push(`${this.tilemap.tiles[i].name} ${j}`);
+          }
+        }
+      }
     }
   }
 </script>

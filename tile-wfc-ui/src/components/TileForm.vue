@@ -164,7 +164,7 @@
           {
             id: this.tileId,
             tile: {
-              name: this.name,
+              name: this.name.replaceAll(" ", "_"),
               symmetry: this.symmetry,
               weight: this.weight,
               assets: this.assets,
