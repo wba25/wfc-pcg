@@ -55,6 +55,7 @@ const store = createStore({
       return {
         path: state.path,
         tilesize: state.tilesize,
+        unique: state.unique,
         tiles: Object.getOwnPropertyNames(state.tiles).length !== 0 ? getObjValues(state.tiles) : [],
         neighbors: Object.getOwnPropertyNames(state.neighbors).length !== 0 ? getObjValues(state.neighbors) : []
       }

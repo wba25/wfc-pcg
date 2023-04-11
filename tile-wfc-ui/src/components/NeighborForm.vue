@@ -42,13 +42,13 @@
         </v-row>
         <v-row>
           <v-col cols="5">
-            <v-img :src="leftImage"></v-img>
+            <v-img :src="leftImage" :class="'tile-variant-' + leftIndex"></v-img>
           </v-col>
           <v-col cols="2" align-self="center">
             <v-icon color="white" icon="mdi-close"></v-icon>
           </v-col>
           <v-col cols="5">
-            <v-img :src="rightImage"></v-img>
+            <v-img :src="rightImage" :class="'tile-variant-' + rightIndex"></v-img>
           </v-col>
         </v-row>
         <v-row align="center" justify="space-between">
@@ -141,12 +141,28 @@
           this.commitNeighborData();
         }
       },
+      leftIndex(newIndex, oldIndex) {
+        if (newIndex !== oldIndex) {
+          this.commitNeighborData();
+        }
+      },
+      rightIndex(newIndex, oldIndex) {
+        if (newIndex !== oldIndex) {
+          this.commitNeighborData();
+        }
+      },
     },
     mounted: function () {
       const storedNeighbor = this.getNeighbor(this.neighborId);
       if (storedNeighbor) {
         [this.left, this.leftIndex] = storedNeighbor.left.split(" ");
         [this.right, this.rightIndex] = storedNeighbor.right.split(" ");
+        if (!this.leftIndex) {
+          this.leftIndex = 0;
+        }
+        if (!this.rightIndex) {
+          this.rightIndex = 0;
+        }
       } else {
         this.left = this.neighborOptions[0].name;
         this.right = this.neighborOptions[0].name;
@@ -214,5 +230,37 @@
   top: 0;
   right: 0;
   z-index: 1;
+}
+
+.tile-variant-0 {
+  /* none*/
+}
+
+.tile-variant-1 {
+  transform: rotate(-90deg);
+}
+
+.tile-variant-2 {
+  transform: rotate(-180deg);
+}
+
+.tile-variant-3 {
+  transform: rotate(-270deg);
+}
+
+.tile-variant-4 {
+  transform: scale(-1, 1);
+}
+
+.tile-variant-5 {
+  transform: rotate(-90deg) scale(-1, 1);
+}
+
+.tile-variant-6 {
+  transform: rotate(-180deg) scale(-1, 1);
+}
+
+.tile-variant-7 {
+  transform: rotate(-270deg) scale(-1, 1);
 }
 </style>
