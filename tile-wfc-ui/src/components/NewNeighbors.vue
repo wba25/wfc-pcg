@@ -36,7 +36,7 @@
           <v-btn size="large" color="secondary" @click="setRegisterStage(0)">Ajustar tiles</v-btn>
         </v-col>
         <v-col cols="auto">
-          <v-btn size="large" color="primary" @click="()=>{}">Gerar Mapa</v-btn>
+          <v-btn size="large" color="primary" :loading="loading" @click="submit">Gerar Mapa</v-btn>
         </v-col>
       </v-row>
     </v-responsive>
@@ -45,7 +45,7 @@
 
 <script>
   import NeighborForm from '@/components/NeighborForm.vue';
-  import { mapGetters, mapMutations } from "vuex";
+  import { mapGetters, mapActions, mapMutations } from "vuex";
   import { v4 as uuidv4 } from "uuid";
   export default {
     components: {
@@ -53,9 +53,10 @@
     },
     data () {
       return {
+        errors: [],
         neighbors: [],
+        loading: false,
         neighborsOpts: [],
-        errors: []
       }
     },
     watch: {},
@@ -66,6 +67,7 @@
       ...mapGetters(["tilemap"])
     },
     methods: {
+      ...mapActions(["storeProcess"]),
       ...mapMutations(["setRegisterStage", "removeNeighbor"]),
       removeNeighborWithId(neighborId) {
         this.neighbors = this.neighbors.filter((n) => n.id !== neighborId);
@@ -75,12 +77,42 @@
         return uuidv4();
       },
       initNeighborsOpts(){
-        this.neighborsOpts = [];
-        for (let i = 0; i < this.tilemap.tiles.length; i++) {
-          for (let j = 0; j < this.tilemap.tiles[i].assets.length; j++) {
-            this.neighborsOpts.push(`${this.tilemap.tiles[i].name} ${j}`);
+        this.neighborsOpts = this.tilemap.tiles;
+        // for (let i = 0; i < this.tilemap.tiles.length; i++) {
+        //   this.neighborsOpts.push(
+        //     {
+        //       data: this.tilemap.tiles[i],
+        //     }
+        //   );
+        //   // `${this.tilemap.tiles[i].name} ${j}`);
+        //   // for (let j = 0; j < this.tilemap.tiles[i].assets.length; j++) {
+        //   // }
+        // }
+      },
+      async submit() {
+        this.loading = true;
+        this.errors = [];
+        if (this.neighbors.length === 0) {
+          this.errors.push({
+            title: "Erro",
+            text: "É necessário adicionar pelo menos um vizinho"
+          });
+        }
+        if (this.errors.length === 0) {
+          try {
+            let res = await this.storeProcess(this.tilemap);
+            if (!res) {
+              throw "Error no servidor";
+            }
+            console.log("res", res);
+          } catch (error) {
+            this.errors.push({
+              title: "Erro ao criar mapa",
+              text: error
+            });
           }
         }
+        this.loading = false;
       }
     }
   }

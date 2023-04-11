@@ -86,7 +86,7 @@
             <v-btn density="compact" icon="mdi-minus" @click="assets.splice(asset, 1)"></v-btn>
           </v-col>
         </v-row>
-        <v-btn icon="mdi-plus" class="ml-1" density="compact" @click="assets.push(1)"></v-btn>
+        <v-btn v-if="hasAddAssetButton" icon="mdi-plus" class="ml-1" density="compact" @click="assets.push(1)"></v-btn>
       </v-form>
     </v-card-text>
   </v-card>
@@ -102,6 +102,10 @@
       },
       onDelete: {
         type: Function,
+        required: true,
+      },
+      unique: {
+        type: Boolean,
         required: true,
       },
     },
@@ -156,6 +160,26 @@
     },
     computed: {
       ...mapGetters(["getTile"]),
+      hasAddAssetButton() {
+        if (!this.unique) {
+          return this.assets.length < 1;
+        } else {
+          switch (this.symmetry) {
+            case "L":
+              return this.assets.length < 4;
+            case "T":
+              return this.assets.length < 4;
+            case "I":
+              return this.assets.length < 2;
+            case "\\":
+              return this.assets.length < 2;
+            case "F":
+              return this.assets.length < 8;
+            default:
+              return this.assets.length < 1;
+          }
+        }
+      },
     },
     methods: {
       ...mapMutations(["addTile"]),

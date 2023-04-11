@@ -23,11 +23,23 @@
         </v-col>
       </v-row>
       <v-row>
+        <v-col cols="12">
+          <v-switch
+            v-model="unique"
+            label="Definir variações dos tiles manualmente"
+            color="primary"
+            density="compact"
+            inset
+            hide-details
+            :disabled="tiles.length > 0"
+          ></v-switch>
+        </v-col>
+      </v-row>
+      <v-row>
         <v-col cols="auto" v-for="tile in tiles">
-          <TileForm :tile-id="tile.id" :onDelete="() => removeTileWithId(tile.id)"/>
+          <TileForm :tile-id="tile.id" :unique="unique" :onDelete="() => removeTileWithId(tile.id)"/>
         </v-col>
         <v-col>
-
           <v-btn
             density="compact"
             icon="mdi-plus"
@@ -83,6 +95,7 @@ export default {
     return {
       tilemapName: "",
       tileSize: 0,
+      unique: false,
       tiles: [],
       errors: [],
     };
@@ -98,17 +111,23 @@ export default {
         this.setTilesize(this.tileSize);
       }
     },
+    unique(newUnique, oldUnique) {
+      if (newUnique !== oldUnique) {
+        this.setUnique(newUnique);
+      }
+    },
   },
   mounted() {
     this.tilemapName = this.getPathName;
     this.tileSize = this.getTilesize;
+    this.unique = this.getUnique;
     this.initTiles(this.getTiles);
   },
   computed: {
-    ...mapGetters(["tilemap", "getPathName", "getTilesize", "getTiles"]),
+    ...mapGetters(["tilemap", "getPathName", "getTilesize", "getTiles", "getUnique"]),
   },
   methods: {
-    ...mapMutations(["setPath", "setTilesize", "setRegisterStage", "removeTile"]),
+    ...mapMutations(["setPath", "setTilesize", "setRegisterStage", "removeTile", "setUnique"]),
     removeTileWithId(tileId) {
       this.tiles = this.tiles.filter((tile) => tile.id !== tileId);
       this.removeTile(tileId);
@@ -134,7 +153,7 @@ export default {
       let error =
         validateTilesNames(this.tilemap.tiles) ||
         validateTilesWeights(this.tilemap.tiles) ||
-        validateTilesSymmetries(this.tilemap.tiles) ||
+        validateTilesSymmetries(this.tilemap.tiles, this.unique) ||
         validateTilesAssets(this.tilemap.tiles);
       if (error) {
         this.errors.push({

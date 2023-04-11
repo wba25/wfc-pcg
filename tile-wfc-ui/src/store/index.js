@@ -1,5 +1,6 @@
 import { createStore } from "vuex";
 import { getObjValues } from "../common/util.js";
+import { api } from "@/services";
 
 const store = createStore({
   state() {
@@ -7,6 +8,7 @@ const store = createStore({
       registerStage: 0,
       path: "data/novo_tilemap/",
       tilesize: 8,
+      unique: false,
       tiles: {}, // {id: "", name: "", symmetry: "", weight: 0, assets: []} // base64 image
       neighbors: {} // { left: "", right: ""}
     };
@@ -20,6 +22,9 @@ const store = createStore({
     },
     setTilesize(state, tilesize) {
         state.tilesize = tilesize;
+    },
+    setUnique(state, unique) {
+        state.unique = unique;
     },
     // Tiles
     resetTiles(state, tiles = []) {
@@ -60,6 +65,9 @@ const store = createStore({
     getTilesize(state) {
       return state.tilesize;
     },
+    getUnique(state) {
+      return state.unique;
+    },
     // Tiles
     getTiles(state) {
       return state.tiles;
@@ -67,11 +75,10 @@ const store = createStore({
     getTile: (state) => (id) => {
       return state.tiles[id] || null;
     },
-    getTileAsset: (state, getters) => (rawName) => {
-      let [name, index] = rawName.split(" ");
+    getTileAsset: (state, getters) => (name, index=0) => {
       let tile = getters.tilemap.tiles.filter(t => t.name === name)[0] || null;
       if (tile) {
-        return tile.assets[parseInt(index)] || null;
+        return tile.assets[index] || null;
       }
       return null;
     },
@@ -81,6 +88,20 @@ const store = createStore({
     },
     getNeighbor: (state) => (id) => {
       return state.neighbors[id] || null;
+    },
+  },
+  actions: {
+    indexProcess: async function({ state, commit }, payload) {
+      var res = await api.get("processes").catch(function(error) {
+        return error.response;
+      });
+      return res.data;
+    },
+    storeProcess: async function({ state, commit }, payload) {
+      var res = await api.post("processes", payload).catch(function(error) {
+        return error.response;
+      });
+      return res.data;
     },
   }
 });
