@@ -27,7 +27,7 @@ function addBitmapDataToStructure(structure, callback) {
   const unique = !!structure.unique;
 
   structure.tiles.map(function (tile) {
-    console.log("The path is", path, tile, unique);
+    // console.log("The path is", path, tile, unique);
     if (unique) {
       if (tile.symmetry === "X") {
         tile.bitmap = new Array(1);
@@ -77,7 +77,7 @@ module.exports = {
                 const finished = model.generate(lcg("test"));
             
                 if (finished) {
-                    console.log("Success");
+                    // console.log("Success");
                     const result = model.graphics();
                 
                     const image = new Jimp(
@@ -89,10 +89,10 @@ module.exports = {
                         }
                     );
                 } else {
-                    console.log("The generation ended in a contradiction");
+                    // console.log("The generation ended in a contradiction");
                 }
             } catch (e) {
-                console.log("An error occurred");
+                // console.log("An error occurred");
                 console.log(e.stack);
             }
         });

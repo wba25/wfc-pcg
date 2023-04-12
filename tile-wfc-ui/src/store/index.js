@@ -1,6 +1,7 @@
 import { createStore } from "vuex";
 import { getObjValues } from "../common/util.js";
 import { api } from "@/services";
+import axios from "axios";
 
 const store = createStore({
   state() {
@@ -92,11 +93,10 @@ const store = createStore({
     },
   },
   actions: {
-    indexProcess: async function({ state, commit }, payload) {
-      var res = await api.get("processes").catch(function(error) {
-        return error.response;
-      });
-      return res.data;
+    indexProcess: async function({ state, commit }) {
+      // axios.defaults.headers.common['Content-Type'] ='application/json;charset=utf-8';
+      // axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+      return axios.get('http://localhost:8080/api/processes');
     },
     storeProcess: async function({ state, commit }, payload) {
       var res = await api.post("processes", payload).catch(function(error) {

@@ -12,7 +12,7 @@
           <v-btn size="large" color="blue" role="link" @click="$router.push('/novo')">Novo</v-btn>
         </v-col>
       </v-row>
-      <v-table density="comfortable" fixed-header="true">
+      <v-table v-if="!loading" density="comfortable" fixed-header="true">
         <thead>
           <tr>
             <th>Tileset</th>
@@ -34,28 +34,40 @@
           </tr>
         </tbody>
       </v-table>
+      <v-progress-circular
+        v-else
+        indeterminate
+        color="primary"
+      ></v-progress-circular>
     </v-responsive>
   </v-container>
 </template>
 
 <script>
+  import { mapActions } from "vuex";
   export default {
     data () {
       return {
-        process: [
-          {
-            name: 'Castle',
-            status: 'Done',
-            tilesize: 8,
-            resultUrl: 'https://i.imgur.com/4Z0ZQ0M.png',
-          },
-          {
-            name: 'Summer',
-            status: 'Pending',
-            tilesize: 19,
-            resultUrl: '',
-          }          
-        ],
+        processes: [],
+        loading: false,
+      }
+    },
+    mounted() {
+      this.getProcesses();
+    },
+    methods: {
+      ...mapActions(["indexProcess"]),
+      async getProcesses() {
+        this.loading = true;
+        try {
+          let res = await this.indexProcess();
+          if (!res) {
+            throw "Error no servidor";
+          }
+        } catch (error) {
+          alert(error);
+        }
+        this.loading = false;
       }
     },
   }
