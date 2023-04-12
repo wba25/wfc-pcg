@@ -7,6 +7,7 @@
             :neighbor-id="neighbor.id"
             :neighbor-options="neighborsOpts"
             :onDelete="() => removeNeighborWithId(neighbor.id)"
+            :unique="tilemap.unique"
           />
         </v-col>
         <v-col>

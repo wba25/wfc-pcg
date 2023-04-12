@@ -42,13 +42,13 @@
         </v-row>
         <v-row>
           <v-col cols="5">
-            <v-img :src="leftImage" :class="'tile-variant-' + leftIndex"></v-img>
+            <v-img :src="leftImage" :class="unique ? '' : 'tile-variant-' + leftIndex"></v-img>
           </v-col>
           <v-col cols="2" align-self="center">
             <v-icon color="white" icon="mdi-close"></v-icon>
           </v-col>
           <v-col cols="5">
-            <v-img :src="rightImage" :class="'tile-variant-' + rightIndex"></v-img>
+            <v-img :src="rightImage" :class="unique ? '' : 'tile-variant-' + rightIndex"></v-img>
           </v-col>
         </v-row>
         <v-row align="center" justify="space-between">
@@ -67,7 +67,7 @@
                 density="compact"
                 height="28"
                 width="28"
-              >{{ i }}</v-btn>
+              ></v-btn>
             </v-btn-toggle> 
           </v-col>
           <v-col>
@@ -85,7 +85,7 @@
                 density="compact"
                 height="28"
                 width="28"
-              >{{ i }}</v-btn>
+              ></v-btn>
             </v-btn-toggle> 
           </v-col>
         </v-row>
@@ -110,7 +110,11 @@
       neighborOptions: {
         type: Array,
         required: true,
-      }
+      },
+      unique: {
+        type: Boolean,
+        default: false,
+      },
     },
     data () { 
       return {
@@ -130,6 +134,7 @@
           this.loadImage(this.left).then((img) => {
             this.leftImage = img;
           });
+          this["leftIndex"] = 0;
           this.commitNeighborData();
         }
       },
@@ -138,17 +143,28 @@
           this.loadImage(this.right).then((img) => {
             this.rightImage = img;
           });
+          this["rightIndex"] = 0;
           this.commitNeighborData();
         }
       },
       leftIndex(newIndex, oldIndex) {
         if (newIndex !== oldIndex) {
           this.commitNeighborData();
+          if (this.unique) {
+            this.loadImage(this.left, newIndex).then((img) => {
+              this.leftImage = img;
+            });
+          }
         }
       },
       rightIndex(newIndex, oldIndex) {
         if (newIndex !== oldIndex) {
           this.commitNeighborData();
+          if (this.unique) {
+            this.loadImage(this.right, newIndex).then((img) => {
+              this.rightImage = img;
+            });
+          }
         }
       },
     },
