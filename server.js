@@ -9,8 +9,3 @@ const listenServer = () => {
 }
 
 listenServer()
-
-// mongo.connect()
-//   .then(listenServer)
-//   .catch(console.error)
-//   .finally(mongo.disconnect);
