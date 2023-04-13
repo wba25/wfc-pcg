@@ -3,8 +3,17 @@
   "version": "0.1.0",
   "private": false,
   "author": "wellington-almeida",
+  "description": "WFC - Procedural Content Generation",
   "license": "MIT",
   "main": "server.js",
+  "keywords": [
+    "wave function collapse",
+    "procedural content generation",
+    "games",
+    "web",
+    "express",
+    "node"
+  ],
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server"
