@@ -4,6 +4,7 @@
   "private": false,
   "author": "wellington-almeida",
   "license": "MIT",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server"
