@@ -10,6 +10,7 @@ module.exports = () => {
 
     // MIDDLEWARES
     app.use(bodyParser.json());
+    app.use("/data", express.static('data'));
 
     // ROTAS
     require('../api/routes/process')(app);
