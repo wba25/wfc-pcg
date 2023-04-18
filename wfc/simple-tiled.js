@@ -1,6 +1,6 @@
 "use strict";
 
-var wfc = require('wavefunctioncollapse');
+var wfc = require("wavefunctioncollapse");
 const Jimp = require("jimp");
 const lcg = require("./lcg");
 
@@ -21,13 +21,12 @@ function loadTileBitmapData(basePath, tile, number) {
   });
 }
 
-function addBitmapDataToStructure(structure, callback) {
+function addBitmapDataToStructure(structure) {
   const promises = [];
   const path = structure.path;
   const unique = !!structure.unique;
 
   structure.tiles.map(function (tile) {
-    // console.log("The path is", path, tile, unique);
     if (unique) {
       if (tile.symmetry === "X") {
         tile.bitmap = new Array(1);
@@ -44,57 +43,43 @@ function addBitmapDataToStructure(structure, callback) {
     }
   });
 
-  Promise.all(promises).then(
-    function () {
-      callback(null, structure);
-    },
-    function (error) {
-      callback(error, null);
-    }
-  );
+  return promises;
 }
 
 module.exports = {
-    run: (definition) => {
-        addBitmapDataToStructure(definition, function (err, definition) {
-            if (err) {
-                throw err;
-            }
-            
-            const destWidth = 20;
-            const destHeight = 20;
-            
-            //try catch to prevent the eventual errors from being silenced by the promise...
-            
-            try {
-                const model = new wfc.SimpleTiledModel(
-                    definition,
-                    null,
-                    destWidth,
-                    destHeight,
-                    false
-                );
-                const finished = model.generate(lcg("test"));
-            
-                if (finished) {
-                    // console.log("Success");
-                    const result = model.graphics();
-                
-                    const image = new Jimp(
-                        destWidth * definition.tilesize,
-                        destHeight * definition.tilesize,
-                        function (err, image) {
-                            image.bitmap.data = Buffer.from(result.buffer);
-                            image.write("output/simple-tiled-model.png");
-                        }
-                    );
-                } else {
-                    // console.log("The generation ended in a contradiction");
-                }
-            } catch (e) {
-                // console.log("An error occurred");
-                console.log(e.stack);
-            }
-        });
+  generate: async (definition) => {
+    var payload = "";
+    var error = null;
+
+    try {
+      const promises = addBitmapDataToStructure(definition);
+      for (let i = 0; i < promises.length; i++) {
+        await promises[i];
+      }
+      const destWidth = 20;
+      const destHeight = 20;
+      const model = new wfc.SimpleTiledModel(
+        definition,
+        null,
+        destWidth,
+        destHeight,
+        false
+      );
+      const finished = model.generate(lcg("test"));
+      if (finished) {
+        const result = model.graphics();
+
+        const image = new Jimp(destWidth * definition.tilesize, destHeight * definition.tilesize);
+        image.bitmap.data = Buffer.from(result.buffer);
+        await image.writeAsync("output/simple-tiled-model.png");
+        payload = await image.getBase64Async(Jimp.MIME_PNG);
+      } else {
+        throw new Error("The generation ended in a contradiction");
+      }
+    } catch (e) {
+      error = e;
     }
-}
+    
+    return [ payload, error ];
+  },
+};

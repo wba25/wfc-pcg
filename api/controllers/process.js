@@ -3,23 +3,36 @@ const mongo = require('../../database/mongo');
 
 
 module.exports = () => {
-    // const processDB = require('../data/castle.json');
     const controller = {};
     
     controller.index = async (req, res) => {
-        res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:3000');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-        res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
         const processes = await mongo.find('processes');
+        mongo.disconnect();
         res.status(200).json(processes);
     };
+
     controller.store = async (req, res) => {
-        const process = req.body;
-        // await mongo.insertOne('processes', process);
-        // mongo.disconnect();
-        // processDB.push(process);
-        wfcModel.run(process);
+        const process = req.body;        
+        await mongo.updateOrCreate('processes', { 'path': process['path'] }, process);
+        mongo.disconnect();
         res.status(201).json(process);
+    };
+
+    controller.generate = async (req, res) => {
+        const processName = `data/${req.params.name}/`;
+        const process = await mongo.findOne('processes', { path: processName.toLowerCase() });
+        mongo.disconnect();
+        if (!process) {
+            res.status(404).json({ message: 'Process not found' });
+            return;
+        }
+        const [result, error] = await wfcModel.generate(process);
+        console.log("got", result, error);
+        if (error) {
+            res.status(500).json({ message: error });
+            return;
+        }
+        res.status(200).json(result);
     };
   
     return controller;

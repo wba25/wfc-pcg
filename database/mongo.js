@@ -20,6 +20,13 @@ module.exports = {
         await collection.insertOne(document);
     },
 
+    updateOrCreate: async (collectionName, query, document) => {
+        await client.connect();
+        const db = client.db(process.env.MONGO_NAME);
+        const collection = db.collection(collectionName);
+        await collection.updateOne(query, { $set: { ...document } }, { upsert: true });
+    },
+
     find: async (collectionName, query = {}) => {
         await client.connect();
         const db = client.db(process.env.MONGO_NAME);
@@ -27,6 +34,14 @@ module.exports = {
         const cursor = collection.find(query);
         const documents = await cursor.toArray();
         return documents;
+    },
+
+    findOne: async (collectionName, query = {}) => {
+        await client.connect();
+        const db = client.db(process.env.MONGO_NAME);
+        const collection = db.collection(collectionName);
+        const document = await collection.findOne(query);
+        return document;
     },
     
     disconnect: async () => {
