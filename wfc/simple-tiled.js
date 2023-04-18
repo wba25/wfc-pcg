@@ -4,8 +4,6 @@ var wfc = require("wavefunctioncollapse");
 const Jimp = require("jimp");
 const lcg = require("./lcg");
 
-// const definition = require("./data/castle.definition.js");
-
 function loadTileBitmapData(basePath, tile, number) {
   const unique = number !== null;
   const tilePath = basePath + tile.name + (unique ? " " + number : "") + ".png";
@@ -48,7 +46,7 @@ function addBitmapDataToStructure(structure) {
 
 module.exports = {
   generate: async (definition) => {
-    var payload = "";
+    const outputPath = "output/simple-tiled-model.png";
     var error = null;
 
     try {
@@ -71,8 +69,7 @@ module.exports = {
 
         const image = new Jimp(destWidth * definition.tilesize, destHeight * definition.tilesize);
         image.bitmap.data = Buffer.from(result.buffer);
-        await image.writeAsync("output/simple-tiled-model.png");
-        payload = await image.getBase64Async(Jimp.MIME_PNG);
+        await image.writeAsync(outputPath);
       } else {
         throw new Error("The generation ended in a contradiction");
       }
@@ -80,6 +77,6 @@ module.exports = {
       error = e;
     }
     
-    return [ payload, error ];
+    return [ outputPath, error ];
   },
 };

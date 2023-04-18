@@ -13,6 +13,7 @@ module.exports = () => {
     app.use(bodyParser.json());
     app.use(cors());
     app.use("/data", express.static('data'));
+    app.use("/output", express.static('output'));
 
     // ROTAS
     require('../api/routes/process')(app);

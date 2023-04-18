@@ -1,7 +1,6 @@
 const wfcModel = require('../../wfc/simple-tiled');
 const mongo = require('../../database/mongo');
 
-
 module.exports = () => {
     const controller = {};
     
@@ -26,13 +25,12 @@ module.exports = () => {
             res.status(404).json({ message: 'Process not found' });
             return;
         }
-        const [result, error] = await wfcModel.generate(process);
-        console.log("got", result, error);
+        const [path, error] = await wfcModel.generate(process);
         if (error) {
             res.status(500).json({ message: error });
             return;
         }
-        res.status(200).json(result);
+        res.status(200).json(path);
     };
   
     return controller;
