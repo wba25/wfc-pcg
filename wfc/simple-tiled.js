@@ -63,7 +63,7 @@ module.exports = {
         destHeight,
         false
       );
-      const finished = model.generate(lcg("test"));
+      const finished = model.generate();
       if (finished) {
         const result = model.graphics();
 
