@@ -29,7 +29,7 @@ module.exports = () => {
         }
         const [path, error] = await wfcModel.generate(process);
         if (error) {
-            res.status(500).json({ message: error });
+            res.status(500).json({ message: error.message });
             return;
         }
         res.status(200).json(path);
