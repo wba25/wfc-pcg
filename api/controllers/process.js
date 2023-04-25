@@ -16,7 +16,7 @@ module.exports = () => {
         await mongo.updateOrCreate('processes', { 'path': process['path'] }, process);
         mongo.disconnect();
         await storage.syncFolder(process['path'], process['tiles']);
-        res.status(201).json(process);
+        res.status(201).json();
     };
 
     controller.generate = async (req, res) => {
