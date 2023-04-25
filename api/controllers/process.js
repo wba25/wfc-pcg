@@ -1,5 +1,6 @@
 const wfcModel = require('../../wfc/simple-tiled');
 const mongo = require('../../database/mongo');
+const storage = require('../../database/storage');
 
 module.exports = () => {
     const controller = {};
@@ -14,6 +15,7 @@ module.exports = () => {
         const process = req.body;        
         await mongo.updateOrCreate('processes', { 'path': process['path'] }, process);
         mongo.disconnect();
+        await storage.syncFolder(process['path'], process['tiles']);
         res.status(201).json(process);
     };
 
