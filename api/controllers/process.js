@@ -12,10 +12,10 @@ module.exports = () => {
     };
 
     controller.store = async (req, res) => {
-        const process = req.body;        
+        const process = req.body;
+        process["tiles"] = await storage.syncFiles(process['path'], process['tiles']);
         await mongo.updateOrCreate('processes', { 'path': process['path'] }, process);
         mongo.disconnect();
-        await storage.syncFolder(process['path'], process['tiles']);
         res.status(201).json();
     };
 
