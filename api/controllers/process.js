@@ -21,13 +21,14 @@ module.exports = () => {
 
     controller.generate = async (req, res) => {
         const processName = `data/${req.params.name}/`;
-        const process = await mongo.findOne('processes', { path: processName.toLowerCase() });
+        const tilemap_process = await mongo.findOne('processes', { path: processName.toLowerCase() });
         mongo.disconnect();
-        if (!process) {
+        if (!tilemap_process) {
             res.status(404).json({ message: 'Process not found' });
             return;
         }
-        const [path, error] = await wfcModel.generate(process);
+        tilemap_process['path'] = process.env.BASE_FILE_URL + tilemap_process['path'];
+        const [path, error] = await wfcModel.generate(tilemap_process);
         if (error) {
             res.status(500).json({ message: error.message });
             return;
