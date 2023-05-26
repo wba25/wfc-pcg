@@ -6,7 +6,7 @@ const lcg = require("./lcg");
 
 function loadTileBitmapData(basePath, tile, number) {
   const unique = number !== null;
-  const tilePath = basePath + tile.name + (unique ? " " + number : "") + ".png";
+  const tilePath = basePath + tile.name + (unique ? " " + number : " 0") + ".png";
 
   return Jimp.read(tilePath).then(function (result) {
     if (unique) {
