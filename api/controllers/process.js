@@ -12,11 +12,15 @@ module.exports = () => {
     };
 
     controller.store = async (req, res) => {
-        const process = req.body;
-        process["tiles"] = await storage.syncFiles(process['path'], process['tiles']);
-        await mongo.updateOrCreate('processes', { 'path': process['path'] }, process);
-        mongo.disconnect();
-        res.status(201).json();
+        try {
+            const process = req.body;
+            process["tiles"] = await storage.syncFiles(process['path'], process['tiles']);
+            await mongo.updateOrCreate('processes', { 'path': process['path'] }, process);
+            mongo.disconnect();
+            res.status(201).json();
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
     };
 
     controller.generate = async (req, res) => {
