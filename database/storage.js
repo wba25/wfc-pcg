@@ -64,6 +64,7 @@ module.exports = {
       const tile = tiles[i];
       for (let j = 0; j < tile["assets"].length; j++) {
         let location = await imageUpload(tile["assets"][j], `${path}${tile["name"]} ${j}`);
+        if (!location) throw new Error("Error uploading image");
         tile["assets"][j] = location;
       }
     }
