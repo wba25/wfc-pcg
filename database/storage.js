@@ -47,13 +47,9 @@ const imageUpload = async (base64, path) => {
   // see: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property
   let location = "";
   let key = "";
-  try {
-    const { Location, Key } = await s3.upload(params).promise();
-    location = Location;
-    key = Key;
-  } catch (error) {
-    console.error(error);
-  }
+  const { Location, Key } = await s3.upload(params).promise();
+  location = Location;
+  key = Key;
 
   return location;
 };
