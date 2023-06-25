@@ -32,7 +32,7 @@ module.exports = () => {
             return;
         }
         tilemap_process['path'] = process.env.BASE_FILE_URL + tilemap_process['path'];
-        const [path, error] = await wfcModel.generate(tilemap_process);
+        const [path, error] = await wfcModel.generate(tilemap_process, destWidth, destHeight);
         if (error) {
             res.status(500).json({ message: error.message });
             return;
