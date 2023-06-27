@@ -2,7 +2,8 @@
 
 var wfc = require("wavefunctioncollapse");
 const Jimp = require("jimp");
-const lcg = require("./lcg");
+// const lcg = require("./lcg");
+const variant = require("./variant");
 
 function loadTileBitmapData(basePath, tile, number) {
   const unique = number !== null;
@@ -44,6 +45,41 @@ function addBitmapDataToStructure(structure) {
   return promises;
 }
 
+function getNeighborns(structure) {
+  const tiles = structure.tiles;
+  const tilesize = structure.tilesize;
+  const unique = !!structure.unique;
+  
+  const tileset = [];
+  for (let i = 0; i < tiles.length; i++) {
+    const tile = tiles[i];
+    const tileVariants = unique ? tile.bitmap : variant.getNotUniqueVariants(tile.bitmap, tile.symmetry, tilesize);
+    for (let j = 0; j < tileVariants.length; j++) {
+      const tileVariant = tileVariants[j];
+      tileset.push({
+        label: tile.name + " " + j,
+        bitmap: tileVariant
+      });
+    }
+  }
+
+  const neighborns = [];
+  for (let i = 0; i < tileset.length; i++) {
+    const leftNeighborn = tileset[i];
+    for (let j = 0; j < tileset.length; j++) {
+      const rightNeighborn = tileset[j];
+      if(variant.areNeighborns(leftNeighborn.bitmap, rightNeighborn.bitmap, tilesize)) {
+        neighborns.push({
+          left: leftNeighborn.label,
+          right: rightNeighborn.label
+        });
+      }
+    }
+  }
+
+  return neighborns;
+}
+
 module.exports = {
   generate: async (definition, destWidth = 20, destHeight = 20) => {
     const outputPath = "output/simple-tiled-model.png";
@@ -77,4 +113,18 @@ module.exports = {
     
     return [ outputPath, error ];
   },
+  neighborns: async (definition) => {
+    var neighborns = [];
+    var error = null;
+    try {
+      const promises = addBitmapDataToStructure(definition);
+      for (let i = 0; i < promises.length; i++) {
+        await promises[i];
+      }
+      neighborns = getNeighborns(definition);
+    } catch (e) {
+      error = e;
+    }
+    return [neighborns, error];
+  }
 };

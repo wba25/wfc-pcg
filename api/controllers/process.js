@@ -23,8 +23,27 @@ module.exports = () => {
         }
     };
 
+    controller.generateNeighbors = async (req, res) => {
+        const processName = `data/${req.params.name}/`;
+        const tilemap_process = await mongo.findOne('processes', { path: processName.toLowerCase() });
+        mongo.disconnect();
+        if (!tilemap_process) {
+            res.status(404).json({ message: 'Process not found' });
+            return;
+        }
+        tilemap_process['path'] = process.env.BASE_FILE_URL + tilemap_process['path'];
+        const [neighborns, error] = await wfcModel.neighborns(tilemap_process);
+        if (error) {
+            res.status(500).json({ message: error.message });
+            return;
+        }
+        res.status(200).json(neighborns);
+    };
+
     controller.generate = async (req, res) => {
         const processName = `data/${req.params.name}/`;
+        const destWidth = req.query.width || 20;
+        const destHeight = req.query.height || 20;
         const tilemap_process = await mongo.findOne('processes', { path: processName.toLowerCase() });
         mongo.disconnect();
         if (!tilemap_process) {

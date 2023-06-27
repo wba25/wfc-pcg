@@ -30,6 +30,7 @@
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "jimp": "^0.22.7",
+    "lodash": "^4.17.21",
     "mongodb": "^5.1.0",
     "morgan": "~1.9.1",
     "wavefunctioncollapse": "^2.1.0"
