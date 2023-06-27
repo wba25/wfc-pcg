@@ -13,6 +13,8 @@ function getVariantRotationDegree(index) {
       return 180;
     case 3:
       return 270;
+    default:
+      return 360;
   }
 }
 
@@ -83,6 +85,13 @@ function addBitmapDataToStructure(structure) {
   return promises;
 }
 
+function addNeighborn(array = [], neighborn) {
+  let elementInverted = array.find(e => e.left === neighborn.right && e.right === neighborn.left);
+  if (elementInverted === undefined) {
+    array.push(neighborn);
+  }
+}
+
 function getNeighborns(structure) {
   const tiles = structure.tiles;
   const tilesize = structure.tilesize;
@@ -106,7 +115,7 @@ function getNeighborns(structure) {
     for (let j = 0; j < tileset.length; j++) {
       const rightNeighborn = tileset[j];
       if(tilesAreNeighborns(leftNeighborn.bitmap, rightNeighborn.bitmap, tilesize)) {
-        neighborns.push({
+        addNeighborn(neighborns, {
           left: leftNeighborn.label,
           right: rightNeighborn.label
         });
