@@ -1,4 +1,5 @@
 const wfcModel = require('../../wfc/simple-tiled');
+const wfcNeighborns = require('../../wfc/simple-neighborns');
 const mongo = require('../../database/mongo');
 const storage = require('../../database/storage');
 
@@ -32,7 +33,7 @@ module.exports = () => {
             return;
         }
         tilemap_process['path'] = process.env.BASE_FILE_URL + tilemap_process['path'];
-        const [neighborns, error] = await wfcModel.neighborns(tilemap_process);
+        const [neighborns, error] = await wfcNeighborns.neighborns(tilemap_process);
         if (error) {
             res.status(500).json({ message: error.message });
             return;
