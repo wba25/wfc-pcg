@@ -36,13 +36,23 @@ function getCardinality(symmetry) {
 }
 
 function getLeftJoinPoints(bitmap, tilesize) {
-  const tileBitmaps = Array.from({ length: bitmap.length / 4 }, (_, i) => bitmap.slice(i * 4, (i + 1) * 4));
-  return [tileBitmaps[tilesize-1], tileBitmaps[tilesize * Math.ceil(tilesize / 2) - 1], tileBitmaps[tilesize * tilesize - 1]];
+  const image = new Jimp(tilesize, tilesize);
+  image.bitmap.data = Buffer.from(bitmap);
+  return [
+    image.getPixelColor(tilesize - 1, 0),
+    image.getPixelColor(tilesize - 1, Math.ceil(tilesize / 2)),
+    image.getPixelColor(tilesize - 1, tilesize - 1)
+  ];
 }
 
 function getRightJoinPoints(bitmap, tilesize) {
-  const tileBitmaps = Array.from({ length: bitmap.length / 4 }, (_, i) => bitmap.slice(i * 4, (i + 1) * 4));
-  return [tileBitmaps[0], tileBitmaps[tilesize * Math.ceil(tilesize / 2) - tilesize - 1], tileBitmaps[tilesize * tilesize - tilesize]];
+  const image = new Jimp(tilesize, tilesize);
+  image.bitmap.data = Buffer.from(bitmap);
+  return [
+    image.getPixelColor(0, 0),
+    image.getPixelColor(0, Math.ceil(tilesize / 2)),
+    image.getPixelColor(0, tilesize - 1)
+  ];
 }
 
 function tilesAreNeighborns(leftBitmap, rightBitmap, tilesize) {
