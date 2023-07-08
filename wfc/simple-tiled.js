@@ -46,7 +46,7 @@ function addBitmapDataToStructure(structure) {
 }
 
 module.exports = {
-  generate: async (definition, destWidth = 20, destHeight = 20) => {
+  generate: async (definition) => {
     const outputPath = "output/simple-tiled-model.png";
     var error = null;
 
@@ -55,6 +55,8 @@ module.exports = {
       for (let i = 0; i < promises.length; i++) {
         await promises[i];
       }
+      const destWidth = definition.width || 20;
+      const destHeight = definition.height || 20;
       const model = new wfc.SimpleTiledModel(
         definition,
         null,
