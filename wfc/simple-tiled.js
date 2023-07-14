@@ -30,7 +30,6 @@ function addBitmapDataToStructure(structure) {
         tile.bitmap = new Array(1);
         promises.push(loadTileBitmapData(path, tile, 0));
       } else {
-        // TODO: fix - nem todo tile tem 4 variante, depende da simetria
         tile.bitmap = new Array(4);
         promises.push(loadTileBitmapData(path, tile, 0));
         promises.push(loadTileBitmapData(path, tile, 1));
