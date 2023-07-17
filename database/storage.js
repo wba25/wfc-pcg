@@ -58,6 +58,7 @@ module.exports = {
   syncFiles: async (path, tiles) => {
     for (let i = 0; i < tiles.length; i++) {
       const tile = tiles[i];
+      tile["weight"] = parseFloat(tile["weight"] || '1');
       for (let j = 0; j < tile["assets"].length; j++) {
         let location = await imageUpload(tile["assets"][j], `${path}${tile["name"]} ${j}`);
         if (!location) throw new Error("Error uploading image");
